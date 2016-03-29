@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenFlow Controller
+After=syslog.target network.target
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+User=root
+ExecStart=/usr/bin/daolicontroller
+
+[Install]
+WantedBy=multi-user.target
+
