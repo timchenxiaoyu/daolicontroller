@@ -9,5 +9,5 @@ Quick Start
 
 If you prefer to install DaoliController from the source code:
 
-   % git clone https://github.com/daolicloud/daolicontroller.git
-   % cd daolicontroller; python ./setup.py install
+	% git clone https://github.com/daolicloud/daolicontroller.git
+	% cd daolicontroller; python ./setup.py install
