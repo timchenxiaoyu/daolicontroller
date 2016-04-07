@@ -112,7 +112,7 @@ class PacketLib(object):
         super(PacketLib, self).__init__()
         self.gateway = {}
         self.container = Container()
-        self.client = DockerHTTPClient(self, CONF.swarm_url)
+        self.client = DockerHTTPClient(self, CONF.api_url)
         self.client.gateways()
         self.client.containers()
         self.arp = PacketARP(self, ryuapp)
