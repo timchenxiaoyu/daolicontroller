@@ -38,8 +38,8 @@ except ImportError:
 CONF = cfg.CONF
 
 CONF.register_opts([
-    cfg.StrOpt('swarm_url', default='http://127.0.0.1:808',
-               help='swarm api url'),
+    cfg.StrOpt('api_url', default='http://127.0.0.1:3380',
+               help='daolinet api url'),
 ])
 
 LOG = logging.getLogger(__name__)
