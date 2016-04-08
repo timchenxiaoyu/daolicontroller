@@ -1,13 +1,28 @@
+Daolicontroller for daolinet
+============================
+
 DaoliController is an OpenFlow Controller which DaoliNet modifies from Ryu to suit a number of novel uses.
 
 
 All of the code is freely available under the Apache 2.0 license.
 Daolicontroller is fully written in Python.
 
-Quick Start
-===========
+Quickstart
+----------
 
-If you prefer to install DaoliController from the source code:
+#### Install ryu that is a openflow framework
 
-	% git clone https://github.com/daolicloud/daolicontroller.git
-	% cd daolicontroller; python ./setup.py install
+	pip install ryu
+
+#### Install requirement package
+
+	yum install -y python-requests python-docker-py
+
+#### Install openflow daolicontroller
+
+	git clone https://github.com/daolicloud/daolicontroller.git
+	cd daolicontroller; python ./setup.py install
+
+#### Run
+
+	daolicontroller
