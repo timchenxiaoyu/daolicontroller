@@ -58,9 +58,11 @@ class DockerHTTPClient(client.Client):
             if r['Driver'] != DOCKER_PLUGIN:
                 continue
             for k, v in r['Containers'].iteritems():
-                v['Id'], v['NetworkId'], v['NetworkName'] = k, r['Id'], r['Name']
-                self._parent.container.new(v)
-                self.node(k)
+                # Docker swarm returns Key started with 'ep-', so we skip it
+                if not k.startswith('ep-'):
+                    v['Id'], v['NetworkId'], v['NetworkName'] = k, r['Id'], r['Name']
+                    self._parent.container.new(v)
+                    self.node(k)
         return res
 
     def node(self, container):
