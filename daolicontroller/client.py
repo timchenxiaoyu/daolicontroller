@@ -99,11 +99,7 @@ class DockerHTTPClient(client.Client):
 
     def policy(self, peer):
         url = self._url("/api/policy/%s" % peer)
-        try:
-            self._result(self._get(url))
-            return True
-        except:
-            return False
+        return self._result(self._get(url))
 
     def group(self, src, dst):
         member_dict = {}

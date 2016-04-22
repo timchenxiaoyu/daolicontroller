@@ -8,6 +8,7 @@ from ryu.ofproto import inet
 from daolicontroller import exception
 from daolicontroller import utils
 from daolicontroller.lib.base import PacketBase
+from daolicontroller.lib.constants import CONNECTED, DISCONNECTED
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
@@ -57,15 +58,20 @@ class PacketIPv4(PacketBase):
                            tcp_src=port)
 
     def filter(self, src, dst):
+        peer = "%s:%s" % (src['Id'], dst['Id'])
+        try:
+            action = self.client.policy(peer)
+            if action == CONNECTED:
+                return True
+            elif action == DISCONNECTED:
+                return False
+        except:
+            return False
+
         if src['NetworkName'] != dst['NetworkName']:
             # returns if group exists src and dst network
             if not self.client.group(src['NetworkName'], dst['NetworkName']):
                 return False
-
-        # returns if policy exists src and dst container
-        peer = "%s:%s" % (min(src['Id'], dst['Id']), max(src['Id'], dst['Id']))
-        if self.client.policy(peer):
-            return False
 
         return True
 
