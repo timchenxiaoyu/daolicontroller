@@ -210,7 +210,6 @@ class PacketIPv4(PacketBase):
         if not snode or not dnode:
             snode = dnode = utils.gethostname()
 
-	print snode, dnode
         # the same node
         if snode == dnode:
             dst_port = self.port_get(dp, id=dst['EndpointID'])
@@ -362,3 +361,40 @@ class PacketIPv4(PacketBase):
         self.add_flow(dp, input_match, input_actions)
         self.add_flow(dp, output_match, output_actions)
         self.packet_out(msg, dp, output_actions)
+
+    def flow_delete(self, sid, did):
+        src = self.container.getc(sid)
+        dst = self.container.getc(did)
+        if not src or not dst:
+            return 
+
+        sdp_id = dpid_lib.str_to_dpid(src['DataPath'])
+        ddp_id = dpid_lib.str_to_dpid(dst['DataPath'])
+
+        if self.ryuapp.dps.has_key(sdp_id):
+            dp = self.ryuapp.dps[sdp_id]
+            ofp, ofp_parser, _, _ = self.ofp_get(dp)
+
+            port = self.port_get(dp, id=src['EndpointID'])
+            if port:
+                match = ofp_parser.OFPMatch(
+                        in_port=port.port_no,
+                        eth_type=ether.ETH_TYPE_IP,
+                        ipv4_src=src['IPv4Address'],
+                        ipv4_dst=dst['IPv4Address'])
+
+                self.delete_flow(dp, match)
+
+        if self.ryuapp.dps.has_key(ddp_id):
+            dp = self.ryuapp.dps[sdp_id]
+            ofp, ofp_parser, _, _ = self.ofp_get(dp)
+
+            port = self.port_get(dp, id=dst['EndpointID'])
+            if port:
+                match = ofp_parser.OFPMatch(
+                        in_port=port.port_no,
+                        eth_type=ether.ETH_TYPE_IP,
+                        ipv4_src=dst['IPv4Address'],
+                        ipv4_dst=src['IPv4Address'])
+
+                self.delete_flow(dp, match)

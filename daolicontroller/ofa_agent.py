@@ -49,14 +49,14 @@ class GroupController(ControllerBase):
         super(GroupController, self).__init__(req, link, data, **config)
         self.app = data['app']
 
-    @route('group', '/v1.0/group', methods=['PUT'])
+    @route('policy', '/v1/policy', methods=['POST'])
     def delete(self, _req, **kwargs):
         body = json.loads(_req.body)
 
         if not body.has_key('sid') or not body.has_key('did'):
             return Response(status=400)
 
-        self.app.group_delete(body['sid'], body['did'])
+        self.app.flow_delete(body['sid'], body['did'])
         return Response(status=200)
 
 class OFAgentRyuApp(app_manager.RyuApp):
@@ -170,14 +170,5 @@ class PacketLib(object):
             self.arp.init_flow(dp, gateway)
             self.ipv4.init_flow(dp, gateway)
 
-    def group_delete(self, sid, did):
-        src = self.db.server_get(sid)
-        dst = self.db.server_get(did)
-
-        src_gateway = self.gateway[src.host]
-        dst_gateway = self.gateway[dst.host]
-
-        if any((not src, not dst, not src_gateway, not dst_gateway)):
-            LOG.warn("Instance could be not found.")
-        else:
-            self.packet_group.run(src, src_gateway, dst, dst_gateway)
+    def flow_delete(self, sid, did):
+        self.ipv4.flow_delete(sid, did)
