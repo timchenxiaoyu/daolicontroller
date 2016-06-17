@@ -249,10 +249,7 @@ class PacketIPv4(PacketBase):
                 LOG.info("target ovs could not be registered.")
                 return False
 
-            try:
-                self.host_flow(msg, dp, in_port, pkt_ether, pkt_ipv4, gateway, src, dst)
-            except:
-                pass
+            self.host_flow(msg, dp, in_port, pkt_ether, pkt_ipv4, gateway, src, dst)
 
     def host_flow(self, msg, dp, in_port, pkt_ether, pkt_ipv4, src_gateway, src, dst):
         ofp, ofp_parser, ofp_set, ofp_out = self.ofp_get(dp)
@@ -278,6 +275,8 @@ class PacketIPv4(PacketBase):
         output_local_actions = [
                 ofp_set(eth_src=liport.hw_addr),
                 ofp_set(eth_dst=riport.hw_addr),
+                ofp_set(ipv4_src=src['UIPAddress']),
+                ofp_set(ipv4_dst=dst['UIPAddress']),
                 ofp_out(liport.port_no),
         ]
 
@@ -285,8 +284,10 @@ class PacketIPv4(PacketBase):
                 in_port=riport.port_no,
                 eth_type=ether.ETH_TYPE_IP,
                 eth_dst=riport.hw_addr,
-                ipv4_src=pkt_ipv4.src,
-                ipv4_dst=pkt_ipv4.dst)
+                #ipv4_src=pkt_ipv4.src,
+                #ipv4_dst=pkt_ipv4.dst)
+                ipv4_src=src['UIPAddress'],
+                ipv4_dst=dst['UIPAddress'])
 
         if pkt_ether.dst == dst['MacAddress']:
             dst_srcmac = pkt_ether.src
@@ -297,6 +298,8 @@ class PacketIPv4(PacketBase):
         input_remote_actions = [
                 rofp_set(eth_src=dst_srcmac),
                 rofp_set(eth_dst=dst['MacAddress']),
+                rofp_set(ipv4_src=pkt_ipv4.src),
+                rofp_set(ipv4_dst=pkt_ipv4.dst),
                 rofp_out(dst_port.port_no)]
 
         output_remote_match = rofp_parser.OFPMatch(
@@ -309,6 +312,8 @@ class PacketIPv4(PacketBase):
         output_remote_actions = [
                 rofp_set(eth_src=riport.hw_addr),
                 rofp_set(eth_dst=liport.hw_addr),
+                rofp_set(ipv4_src=dst['UIPAddress']),
+                rofp_set(ipv4_dst=src['UIPAddress']),
                 ofp_out(riport.port_no),
         ]
 
@@ -316,12 +321,16 @@ class PacketIPv4(PacketBase):
                 in_port=liport.port_no,
                 eth_type=ether.ETH_TYPE_IP,
                 eth_dst=liport.hw_addr,
-                ipv4_src=pkt_ipv4.dst,
-                ipv4_dst=pkt_ipv4.src)
+                #ipv4_src=pkt_ipv4.dst,
+                #ipv4_dst=pkt_ipv4.src)
+                ipv4_src=dst['UIPAddress'],
+                ipv4_dst=src['UIPAddress'])
 
         input_local_actions = [
                 ofp_set(eth_src=pkt_ether.dst),
                 ofp_set(eth_dst=pkt_ether.src),
+                ofp_set(ipv4_src=pkt_ipv4.dst),
+                ofp_set(ipv4_dst=pkt_ipv4.src),
                 ofp_out(in_port),
         ]
 

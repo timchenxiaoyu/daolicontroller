@@ -26,6 +26,7 @@ from ryu.ofproto import inet
 from ryu.ofproto import ofproto_v1_2 as ryu_ofp12
 
 from daolicontroller.client import DockerHTTPClient
+from daolicontroller.ipam import IPAM
 from daolicontroller.lib import PacketARP, PacketIPv4
 from daolicontroller.objects import PortState
 from daolicontroller.objects import Container
@@ -111,6 +112,7 @@ class PacketLib(object):
     def __init__(self, ryuapp):
         super(PacketLib, self).__init__()
         self.gateway = {}
+        self.ipam = IPAM()
         self.container = Container()
         self.client = DockerHTTPClient(self, CONF.api_url)
         self.client.gateways()

@@ -1,3 +1,4 @@
+import logging
 import os
 import collections
 
@@ -26,6 +27,8 @@ CONF.register_opts(docker_opts, 'docker')
 DOCKER_PLUGIN = 'daolinet'
 DEFAULT_TIMEOUT_SECONDS = 120
 DEFAULT_DOCKER_API_VERSION = '1.19'
+
+LOG = logging.getLogger(__name__)
 
 
 class DockerHTTPClient(client.Client):
@@ -67,11 +70,18 @@ class DockerHTTPClient(client.Client):
 
     def node(self, container):
         obj = self._parent.container[container]
+        if not obj.has_key('UIPAddress'):
+            try:
+                obj['UIPAddress'] = self._parent.ipam.alloc()
+            except Exception as e:
+                LOG.warn(e.message)
+
         if not obj.has_key('Node'):
             try:
                 info = self.inspect_container(container)
                 obj['Node'] = info['Node']['IP']
-            except:
+            except Exception as e:
+                LOG.warn(e.message)
                 return None
 
         if not obj.has_key('DataPath'):
