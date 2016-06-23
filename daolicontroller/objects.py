@@ -1,7 +1,15 @@
+#-*- coding: utf-8 -*-
+"""定义一些全局变量类.
+
+   Container: 保存容器网络信息.
+   PortState: 交换机端口信息.
+"""
+
 from netaddr import IPNetwork
 
 class Container(dict):
     def new(self, container):
+        """将容器的IPv4Address，Id, EndpointID, MacAddress信息保存起来."""
         key = str(IPNetwork(container['IPv4Address']).ip)
         container['IPv4Address'] = key
         self[key] = container
@@ -14,45 +22,12 @@ class PortState(dict):
         super(PortState, self).__init__()
 
     def add(self, port):
+        """以容器网卡端口号和容器网卡名为key，存储port信息."""
         self[port.port_no] = self[port.name] = port
 
     def remove(self, port):
+        """删除容器网卡端口号和网卡名为key的数据."""
         if self.has_key(port.port_no):
             del self[port.port_no]
         if self.has_key(port.name):
             del self[port.name]
-
-class GatewayState(dict):
-    def new(self, gateway):
-        self[gateway.datapath_id] = self[gateway.hostname] = gateway
-
-class HashPort:
-    def __init__(self):
-        self._ports = {}
-
-    def keys(self):
-        return self._ports.keys()
-
-    def has_key(self, key):
-        return self._ports.has_key(key)
-
-    def get(self, key):
-        return self._ports.get(key)
-
-    def set(self, key, value):
-        self._ports[key] = value
-
-    def update(self, key, value):
-        self.set(key, value)
-
-    def remove(self, key):
-        try:
-            del self._ports[key]
-        except KeyError:
-            pass
-
-    def clear(self):
-        self._ports.clear()
-
-    def __len__(self):
-        return len(self._ports)

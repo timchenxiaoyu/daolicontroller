@@ -1,3 +1,6 @@
+#-*- coding: utf-8 -*-
+"""DaoliNet OpenFlow控制器入口程序，由服务程序调用main方法."""
+
 from ryu.lib import hub
 hub.patch(thread=False)
 
@@ -21,6 +24,7 @@ CONF.register_cli_opts([
 
 def main(args=None, prog=None):
     try:
+        # 预加载配置选项和文件，包括所有由CONF变量指定的选项
         CONF(args=args, prog=prog,
              project='daolicontroller', version='1.1',
              default_config_files=['/etc/daolicontroller/daolicontroller.conf'])
@@ -28,8 +32,10 @@ def main(args=None, prog=None):
         CONF(args=args, prog=prog,
              project='daolicontroller', version='1.1')
 
+    # 初始化日志，完成日志格式的定义等
     log.init_log()
 
+    # 将Ryu中定义的变量合并到当前CONF中.
     if ryu_cfg.CONF is not CONF:
         ryu_cfg.CONF(args=args, project='ryu')
 
@@ -40,4 +46,5 @@ def main(args=None, prog=None):
     else:
         hub.patch(thread=True)
 
+    # 通过Ryu加载主控制器ofa_agent中定义的应用程序
     AppManager.run_apps(['daolicontroller.ofa_agent'])

@@ -1,3 +1,11 @@
+"""定义的一些异常类.
+
+   OPFException: 异常基类
+   DevicePortNotFound: OpenFlow交换机不存在某个网卡设备
+   NotFound: 不存在某个资源
+   ContainerNotFound: 不存在指定容器
+"""
+
 
 class OPFException(Exception):
     message = "An unknown exception occurred."
@@ -22,26 +30,8 @@ class OPFException(Exception):
 class DevicePortNotFound(OPFException):
     message = 'no such network device %(device)s'
 
-class IPAddressNotMatch(OPFException):
-    message = 'IP address %(address)s do not match'
-
 class NotFound(OPFException):
     message = "Resource could not be found."
 
 class ContainerNotFound(NotFound):
     message = "Container %(container)s could not be found."
-
-class FixedIpNotFound(NotFound):
-    message = "No fixed IP associated with id %(id)s."
-
-class FixedIpNotFoundForInstance(FixedIpNotFound):
-    message = "Instance %(instance_uuid)s has zero fixed ips."
-
-class Invalid(OPFException):
-    message = "Unacceptable parameters."
-
-class InvalidUUID(Invalid):
-    message = "Expected a uuid but received %(uuid)s."
-
-class InvalidIpAddressError(Invalid):
-    message = "%(address)s is not a valid IP v4/6 address."

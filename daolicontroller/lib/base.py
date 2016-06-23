@@ -1,4 +1,4 @@
-"""Packet base class."""
+"""处理PacketIn消息的基类."""
 
 import abc
 import six
@@ -23,11 +23,13 @@ class PacketBase(object):
         self.ryuapp = ryuapp
 
     def getc(self, key):
+        """如果没有指定容器，则重新获取."""
         if not self.container.get(key):
             self.client.containers()
         return self.container.get(key)
 
     def gateway_get(self, dpid):
+        """从PacketLib中获取网关信息."""
         return self.manager.gateway[dpid]
 
     @abc.abstractmethod
@@ -36,6 +38,11 @@ class PacketBase(object):
         raise NotImplementedError()
 
     def port_get(self, dp, devname=None, id=None):
+        """通过设备名称或者id获取网卡信息.
+
+           如果devname为空，则devname为id的前11个字符组成的设备名.
+           如果存在devname则返回，否则返回None.
+        """
         if devname is None:
             devname = LOCAL_PREFIX + id[:11]
 
@@ -43,6 +50,7 @@ class PacketBase(object):
             return self.ryuapp.port_state[dp.id].get(devname)
 
     def _redirect(self, dp, inport, outport, **kwargs):
+        """构造转发maction和action条件，执行添加流表操作."""
         ofp, ofp_parser, ofp_set, ofp_out = self.ofp_get(dp)
 
         actions = [ofp_parser.OFPActionOutput(outport)]
@@ -52,6 +60,7 @@ class PacketBase(object):
 
 
     def ofp_get(self, dp):
+        """从datapath中解析一些通用变量."""
         ofp = dp.ofproto
         ofp_parser = dp.ofproto_parser
         ofp_set = ofp_parser.OFPActionSetField
@@ -59,6 +68,7 @@ class PacketBase(object):
         return (ofp, ofp_parser, ofp_set, ofp_out)
 
     def packet_out(self, msg, dp, actions, in_port=None):
+        """构造PacketOut消息，并发送到OpenFlow交换机."""
         ofproto = dp.ofproto
         parser = dp.ofproto_parser
 
@@ -77,6 +87,7 @@ class PacketBase(object):
 
     def add_flow(self, dp, match=None, actions=None, timeout=None,
                  table_id=0, priority=None, inst=None):
+        """构造OFPFlowMod添加流表消息并下发到交换机."""
         ofproto = dp.ofproto
         parser = dp.ofproto_parser
 
@@ -100,6 +111,7 @@ class PacketBase(object):
         dp.send_msg(mod)
 
     def delete_flow(self, dp, match, table_id=0):
+        """构造OFPFlowMod删除流表消息并下发到交换机."""
         ofproto = dp.ofproto
         parser = dp.ofproto_parser
 
