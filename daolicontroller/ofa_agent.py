@@ -60,6 +60,10 @@ class GroupController(ControllerBase):
         self.app.flow_delete(body['sid'], body['did'])
         return Response(status=200)
 
+    @route('containers', '/v1/containers/{id}', methods=['POST'])
+    def remove_container(self, _req, id, **kwargs):
+        self.app.remove_container(id)
+
 class OFAgentRyuApp(app_manager.RyuApp):
     OFP_VERSIONS = [ryu_ofp12.OFP_VERSION]
     _CONTEXTS = {'dpset': dpset.DPSet,
@@ -105,7 +109,7 @@ class OFAgentRyuApp(app_manager.RyuApp):
             self.packetlib.packet_in_handler(ev)
         except ConnectionError:
             LOG.warn("Connection aborted. Retring again.")
-            greenthread.sleep(2)
+            greenthread.sleep(0)
 
 class PacketLib(object):
 
@@ -174,3 +178,6 @@ class PacketLib(object):
 
     def flow_delete(self, sid, did):
         self.ipv4.flow_delete(sid, did)
+
+    def remove_container(self, id):
+        self.container.remove(id)
