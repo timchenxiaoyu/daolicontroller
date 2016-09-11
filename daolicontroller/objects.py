@@ -9,6 +9,14 @@ class Container(dict):
         self[container['EndpointID']] = container
         self[container['MacAddress']] = container
 
+    def remove(self, id):
+        container = self.get(id)
+        if container:
+            del self[container['Id']]
+            del self[container['EndpointID']]
+            del self[container['MacAddress']]
+            del self[container['IPv4Address']]
+
 class PortState(dict):
     def __init__(self):
         super(PortState, self).__init__()
