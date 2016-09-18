@@ -4,11 +4,12 @@ class Container(dict):
     def new(self, container):
         key = str(IPNetwork(container['IPv4Address']).ip)
         container['IPv4Address'] = key
-        self[key] = container
-        self[key] = container
-        if not self.has_key(container['Id']):
+        if not self.has_key(key):
+            self[key] = container
+            self[container['Id']] = container
             self[container['EndpointID']] = container
-        self[container['MacAddress']] = container
+            self[container['MacAddress']] = container
+
 
     def remove(self, id):
         container = self.get(id)
