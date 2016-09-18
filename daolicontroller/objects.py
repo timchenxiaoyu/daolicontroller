@@ -5,8 +5,9 @@ class Container(dict):
         key = str(IPNetwork(container['IPv4Address']).ip)
         container['IPv4Address'] = key
         self[key] = container
-        self[container['Id']] = container
-        self[container['EndpointID']] = container
+        self[key] = container
+        if not self.has_key(container['Id']):
+            self[container['EndpointID']] = container
         self[container['MacAddress']] = container
 
     def remove(self, id):
