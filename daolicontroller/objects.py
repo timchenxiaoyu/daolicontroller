@@ -4,6 +4,7 @@ class Container(dict):
     def new(self, container):
         key = str(IPNetwork(container['IPv4Address']).ip)
         container['IPv4Address'] = key
+        #if mult tenant ,same container ip ,it's has problem
         if not self.has_key(key):
             self[key] = container
             self[container['Id']] = container
